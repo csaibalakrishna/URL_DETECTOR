@@ -147,31 +147,29 @@
     
     <!-- Custom JavaScript -->
     <script>
-        document.getElementById('analyzeForm').addEventListener('submit', function(e) {
-            const btn = document.getElementById('analyzeBtn');
-            const originalText = btn.innerHTML;
-            
-            // Show loading state
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing...';
-            btn.disabled = true;
-            
-            // Reset button after 30 seconds if form hasn't completed
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }, 30000);
-        });
-
-        // Auto-focus URL input
-        document.getElementById('url').focus();
+    document.getElementById('analyzeForm').addEventListener('submit', function(e) {
+        const btn = document.getElementById('analyzeBtn');
+        const originalText = btn.innerHTML;
         
-        // URL validation
-        document.getElementById('url').addEventListener('input', function(e) {
-            const url = e.target.value;
-            if (url && !url.match(/^https?:\/\//)) {
-                e.target.setCustomValidity('');
-            }
-        });
-    </script>
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing...';
+        btn.disabled = true;
+        
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }, 15000);  // 15 seconds instead of 30
+    });
+
+    document.getElementById('url').focus();
+
+    document.getElementById('url').addEventListener('input', function(e) {
+        const url = e.target.value;
+        if (url && !url.match(/^(https?:\/\/)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)) {
+            e.target.setCustomValidity('Enter a valid URL (e.g., https://example.com)');
+        } else {
+            e.target.setCustomValidity('');
+        }
+    });
+</script>
 </body>
 </html>
