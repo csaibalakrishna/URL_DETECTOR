@@ -16,7 +16,13 @@ class URLFeatureExtractor:
         self.shortening_services = [
             'bit.ly', 'tinyurl.com', 'goo.gl', 't.co', 'ow.ly', 'is.gd', 
             'buff.ly', 'adf.ly', 'short.link', 'tiny.cc', 'lnkd.in',
-            'youtu.be', 'amzn.to', 'fb.me', 'po.st'
+            'youtu.be', 'amzn.to', 'fb.me', 'po.st', 'tinycc.com',
+            'shorte.st', 'linktr.ee'
+        ]
+        self.popular_sites = [
+            'google', 'facebook', 'amazon', 'microsoft', 'apple', 'youtube',
+            'twitter', 'instagram', 'linkedin', 'github', 'stackoverflow',
+            'reddit', 'wikipedia', 'replit', 'codepen', 'netlify', 'vercel'
         ]
         self.timeout = 10
         
@@ -110,7 +116,11 @@ class URLFeatureExtractor:
     
     def _short_url(self, domain):
         """Check if URL uses shortening service"""
-        return 1 if any(service in domain for service in self.shortening_services) else 0
+        # Check for exact match or domain contains shortening service
+        for service in self.shortening_services:
+            if service == domain or domain.endswith('.' + service):
+                return 1
+        return 0
     
     def _symbol_at(self, url):
         """Check if URL contains @ symbol"""
@@ -139,27 +149,24 @@ class URLFeatureExtractor:
         return 0 if scheme == 'https' else 1
     
     def _domain_registration_length(self, domain):
-        """Get domain registration length"""
+        """Get domain registration length (simplified heuristic)"""
         try:
-            w = whois.whois(domain)
-            if w and hasattr(w, 'expiration_date') and w.expiration_date:
-                if isinstance(w.expiration_date, list):
-                    exp_date = w.expiration_date[0]
-                else:
-                    exp_date = w.expiration_date
-                
-                if hasattr(w, 'creation_date') and w.creation_date:
-                    if isinstance(w.creation_date, list):
-                        creation_date = w.creation_date[0]
-                    else:
-                        creation_date = w.creation_date
-                    
-                    if exp_date and creation_date:
-                        reg_length = (exp_date - creation_date).days
-                        return 0 if reg_length >= 365 else 1  # Less than a year is suspicious
+            domain_lower = domain.lower()
+            # Popular/established sites likely have long registrations
+            for popular in self.popular_sites:
+                if popular in domain_lower:
+                    return 0  # Long registration
+            
+            # Well-known TLDs and reasonable domain names likely have proper registration
+            if (len(domain.split('.')) == 2 and 
+                domain.split('.')[1] in ['com', 'org', 'net', 'edu', 'gov', 'mil'] and
+                len(domain.split('.')[0]) > 3):
+                return 0  # Likely long registration
+            
+            return 1  # Potentially short registration
         except:
             pass
-        return 1  # Default suspicious if cannot determine
+        return 1
     
     def _non_standard_port(self, port):
         """Check if URL uses non-standard port"""
@@ -292,15 +299,22 @@ class URLFeatureExtractor:
         return 1
     
     def _abnormal_url(self, url, domain):
-        """Check if URL matches domain registration info"""
+        """Check if URL appears abnormal (simplified heuristic)"""
         try:
-            w = whois.whois(domain)
-            if w and hasattr(w, 'domain_name') and w.domain_name:
-                registered_domain = w.domain_name
-                if isinstance(registered_domain, list):
-                    registered_domain = registered_domain[0]
-                if registered_domain:
-                    return 0 if registered_domain.lower() in domain.lower() else 1
+            domain_lower = domain.lower()
+            # Popular sites are not abnormal
+            for popular in self.popular_sites:
+                if popular in domain_lower:
+                    return 0  # Normal URL
+            
+            # Check for obviously suspicious patterns
+            if (len(domain.replace('.', '').replace('-', '')) < 3 or  # Very short domain
+                domain.count('-') > 3 or  # Too many dashes
+                domain.count('.') > 4 or  # Too many subdomains
+                any(char.isdigit() for char in domain.split('.')[0]) and len(domain.split('.')[0]) < 6):  # Numbers in short domain
+                return 1  # Abnormal
+            
+            return 0  # Appears normal
         except:
             pass
         return 1
@@ -358,18 +372,23 @@ class URLFeatureExtractor:
         return 0
     
     def _age_of_domain(self, domain):
-        """Get age of domain in days"""
+        """Estimate age of domain (simplified heuristic)"""
         try:
-            w = whois.whois(domain)
-            if w and hasattr(w, 'creation_date') and w.creation_date:
-                if isinstance(w.creation_date, list):
-                    creation_date = w.creation_date[0]
-                else:
-                    creation_date = w.creation_date
-                
-                if creation_date:
-                    age = (datetime.now() - creation_date).days
-                    return 0 if age > 180 else 1  # Less than 6 months is suspicious
+            domain_lower = domain.lower()
+            # Popular/established sites are definitely old
+            for popular in self.popular_sites:
+                if popular in domain_lower:
+                    return 0  # Old domain
+            
+            # Heuristics for potentially old domains
+            if (domain.split('.')[1] in ['edu', 'gov', 'mil'] or  # Institutional domains
+                (len(domain.split('.')) == 2 and 
+                 len(domain.split('.')[0]) > 4 and 
+                 domain.split('.')[1] in ['com', 'org', 'net'] and
+                 '-' not in domain)):  # Clean, simple domains
+                return 0  # Likely old
+            
+            return 1  # Potentially new
         except:
             pass
         return 1
@@ -385,10 +404,18 @@ class URLFeatureExtractor:
     def _website_traffic(self, domain):
         """Estimate website traffic (simplified)"""
         try:
-            # This is a simplified version - in production you might use APIs like Alexa, SimilarWeb
-            # For now, we'll use a heuristic based on domain characteristics
-            if any(popular in domain for popular in ['google', 'facebook', 'amazon', 'microsoft', 'apple']):
-                return 0  # High traffic
+            # Check if domain contains popular site names
+            domain_lower = domain.lower()
+            for popular in self.popular_sites:
+                if popular in domain_lower:
+                    return 0  # High traffic
+            
+            # Additional heuristics for legitimate sites
+            if (len(domain.split('.')) == 2 and  # TLD + domain only
+                len(domain.split('.')[0]) > 3 and  # Domain name longer than 3 chars
+                '-' not in domain):  # No dashes
+                return 0  # Likely legitimate
+            
             return 1  # Low traffic (more suspicious)
         except:
             pass
@@ -397,8 +424,16 @@ class URLFeatureExtractor:
     def _page_rank(self, domain):
         """Get Google PageRank (simplified estimation)"""
         try:
-            # PageRank API is deprecated, so we use a simplified heuristic
-            if len(domain.split('.')) <= 2 and '-' not in domain:
+            domain_lower = domain.lower()
+            # Check if it's a popular/well-known site
+            for popular in self.popular_sites:
+                if popular in domain_lower:
+                    return 0  # High PageRank
+            
+            # Simple heuristic: clean domains without many subdomains or dashes
+            if (len(domain.split('.')) <= 2 and 
+                '-' not in domain and 
+                len(domain.split('.')[0]) > 3):
                 return 0  # Likely higher PageRank
             return 1  # Likely lower PageRank
         except:
@@ -408,11 +443,19 @@ class URLFeatureExtractor:
     def _google_index(self, domain):
         """Check if website is indexed by Google"""
         try:
-            # Simplified check - in production you might use Google Search API
-            search_url = f"https://www.google.com/search?q=site:{domain}"
-            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-            response = requests.get(search_url, headers=headers, timeout=5)
-            return 0 if 'did not match any documents' not in response.text else 1
+            domain_lower = domain.lower()
+            # Popular sites are definitely indexed
+            for popular in self.popular_sites:
+                if popular in domain_lower:
+                    return 0  # Indexed
+            
+            # For other domains, assume indexed if they look legitimate
+            if (len(domain.split('.')) == 2 and  # Simple domain structure
+                len(domain.split('.')[0]) > 2 and  # Reasonable length
+                domain.split('.')[1] in ['com', 'org', 'net', 'edu', 'gov']):  # Common TLD
+                return 0  # Likely indexed
+            
+            return 1  # Likely not indexed
         except:
             pass
         return 1

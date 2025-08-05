@@ -80,36 +80,36 @@ class URLClassifier:
         
         for _ in range(n_legit):
             features = [
-                np.random.choice([0, 1], p=[0.95, 0.05]),  # UsingIP - mostly 0 for legit
-                np.random.choice([0, 1], p=[0.8, 0.2]),   # LongURL - mostly short for legit
-                np.random.choice([0, 1], p=[0.98, 0.02]), # ShortURL - rarely short URLs
-                np.random.choice([0, 1], p=[0.99, 0.01]), # Symbol@ - rare in legit URLs
-                np.random.choice([0, 1], p=[0.95, 0.05]), # Redirecting// - rare
-                np.random.choice([0, 1], p=[0.7, 0.3]),   # PrefixSuffix- - sometimes present
-                np.random.choice([0, 1, 2], p=[0.6, 0.3, 0.1]), # SubDomains - mostly 0-1
-                np.random.choice([0, 1], p=[0.7, 0.3]),   # HTTPS - mostly use HTTPS
-                np.random.choice([0, 1], p=[0.8, 0.2]),   # DomainRegLen - mostly long reg
-                np.random.choice([0, 1], p=[0.9, 0.1]),   # Favicon - usually from same domain
-                np.random.choice([0, 1], p=[0.95, 0.05]), # NonStdPort - usually standard
-                np.random.choice([0, 1], p=[0.8, 0.2]),   # HTTPSDomainURL
-                np.random.choice([0, 1], p=[0.85, 0.15]), # RequestURL
-                np.random.choice([0, 1], p=[0.8, 0.2]),   # AnchorURL
+                np.random.choice([0, 1], p=[0.98, 0.02]),  # UsingIP - almost never for legit
+                np.random.choice([0, 1], p=[0.7, 0.3]),   # LongURL - sometimes long for legit
+                np.random.choice([0, 1], p=[0.99, 0.01]), # ShortURL - rarely short URLs
+                np.random.choice([0, 1], p=[0.995, 0.005]), # Symbol@ - very rare in legit URLs
+                np.random.choice([0, 1], p=[0.98, 0.02]), # Redirecting// - very rare
+                np.random.choice([0, 1], p=[0.6, 0.4]),   # PrefixSuffix- - common in legit sites
+                np.random.choice([0, 1, 2], p=[0.5, 0.4, 0.1]), # SubDomains - often 0-1
+                np.random.choice([0, 1], p=[0.85, 0.15]), # HTTPS - mostly use HTTPS
+                np.random.choice([0, 1], p=[0.9, 0.1]),   # DomainRegLen - mostly long reg
+                np.random.choice([0, 1], p=[0.95, 0.05]), # Favicon - usually from same domain
+                np.random.choice([0, 1], p=[0.98, 0.02]), # NonStdPort - usually standard
+                np.random.choice([0, 1], p=[0.9, 0.1]),   # HTTPSDomainURL
+                np.random.choice([0, 1], p=[0.9, 0.1]),   # RequestURL
+                np.random.choice([0, 1], p=[0.85, 0.15]), # AnchorURL
                 np.random.choice([0, 1], p=[0.9, 0.1]),   # LinksInScriptTags
-                np.random.choice([0, 1], p=[0.95, 0.05]), # ServerFormHandler
-                np.random.choice([0, 1], p=[0.6, 0.4]),   # InfoEmail
-                np.random.choice([0, 1], p=[0.9, 0.1]),   # AbnormalURL
-                np.random.choice([0, 1], p=[0.95, 0.05]), # WebsiteForwarding
-                np.random.choice([0, 1], p=[0.98, 0.02]), # StatusBarCust
-                np.random.choice([0, 1], p=[0.98, 0.02]), # DisableRightClick
-                np.random.choice([0, 1], p=[0.95, 0.05]), # UsingPopupWindow
-                np.random.choice([0, 1], p=[0.9, 0.1]),   # IframeRedirection
-                np.random.choice([0, 1], p=[0.8, 0.2]),   # AgeofDomain
-                np.random.choice([0, 1], p=[0.95, 0.05]), # DNSRecording
-                np.random.choice([0, 1], p=[0.7, 0.3]),   # WebsiteTraffic
-                np.random.choice([0, 1], p=[0.7, 0.3]),   # PageRank
-                np.random.choice([0, 1], p=[0.8, 0.2]),   # GoogleIndex
-                np.random.choice([0, 1], p=[0.7, 0.3]),   # LinksPointingToPage
-                np.random.choice([0, 1], p=[0.6, 0.4])    # StatsReport
+                np.random.choice([0, 1], p=[0.98, 0.02]), # ServerFormHandler
+                np.random.choice([0, 1], p=[0.4, 0.6]),   # InfoEmail - many legit sites have email
+                np.random.choice([0, 1], p=[0.95, 0.05]), # AbnormalURL
+                np.random.choice([0, 1], p=[0.98, 0.02]), # WebsiteForwarding
+                np.random.choice([0, 1], p=[0.99, 0.01]), # StatusBarCust
+                np.random.choice([0, 1], p=[0.99, 0.01]), # DisableRightClick
+                np.random.choice([0, 1], p=[0.98, 0.02]), # UsingPopupWindow
+                np.random.choice([0, 1], p=[0.95, 0.05]), # IframeRedirection
+                np.random.choice([0, 1], p=[0.9, 0.1]),   # AgeofDomain - most legit sites are old
+                np.random.choice([0, 1], p=[0.98, 0.02]), # DNSRecording
+                np.random.choice([0, 1], p=[0.8, 0.2]),   # WebsiteTraffic - better distribution for legit
+                np.random.choice([0, 1], p=[0.8, 0.2]),   # PageRank - better for legit
+                np.random.choice([0, 1], p=[0.9, 0.1]),   # GoogleIndex - most legit sites indexed
+                np.random.choice([0, 1], p=[0.75, 0.25]), # LinksPointingToPage
+                np.random.choice([0, 1], p=[0.7, 0.3])    # StatsReport
             ]
             legit_features.append(features)
         
