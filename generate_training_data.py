@@ -112,13 +112,13 @@ def generate_training_data(n_samples=10000):
     for i, (features, label) in enumerate(zip(all_features, labels)):
         row = dict(zip(feature_names, features))
         row['Index'] = i + 1
-        row['Class'] = label
+        row['label'] = label
         data.append(row)
     
     df = pd.DataFrame(data)
     
     # Reorder columns to match the original feature order
-    columns_order = ['Index'] + feature_names + ['Class']
+    columns_order = ['Index'] + feature_names + ['label']
     df = df[columns_order]
     
     return df
@@ -138,9 +138,9 @@ def main():
     # Display statistics
     print(f"\nTraining Data Statistics:")
     print(f"Total samples: {len(df)}")
-    print(f"Legitimate URLs (Class 0): {len(df[df['Class'] == 0])}")
-    print(f"Malicious URLs (Class 1): {len(df[df['Class'] == 1])}")
-    print(f"Features: {len(df.columns) - 2}")  # Exclude Index and Class
+    print(f"Legitimate URLs (label 0): {len(df[df['label'] == 0])}")
+    print(f"Malicious URLs (label 1): {len(df[df['label'] == 1])}")
+    print(f"Features: {len(df.columns) - 2}")  # Exclude Index and label
     print(f"CSV file saved: {csv_filename}")
     
     # Show first few rows
