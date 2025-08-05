@@ -1,0 +1,199 @@
+/* Custom styles for URL Security Analyzer */
+
+.hero-icon {
+    font-size: 4rem;
+    color: var(--bs-primary);
+    opacity: 0.8;
+}
+
+.feature-card {
+    background: rgba(var(--bs-light-rgb), 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(var(--bs-border-color-rgb), 0.2);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.feature-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: var(--bs-primary);
+}
+
+.feature-icon {
+    font-size: 2.5rem;
+    color: var(--bs-primary);
+    opacity: 0.8;
+}
+
+.risk-score {
+    position: relative;
+}
+
+.risk-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    margin: 0 auto;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.risk-circle::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    z-index: -1;
+}
+
+.table th {
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+    background-color: rgba(var(--bs-light-rgb), 0.1);
+}
+
+.table td {
+    border-color: rgba(var(--bs-border-color-rgb), 0.1);
+    vertical-align: middle;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+}
+
+.progress {
+    background-color: rgba(var(--bs-secondary-rgb), 0.2);
+}
+
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-1px);
+}
+
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.badge {
+    font-weight: 500;
+    padding: 0.5em 0.75em;
+}
+
+.input-group-lg .form-control {
+    border-radius: 0 8px 8px 0;
+}
+
+.input-group-lg .input-group-text {
+    border-radius: 8px 0 0 8px;
+}
+
+/* Loading animations */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.loading {
+    animation: pulse 2s infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hero-icon {
+        font-size: 3rem;
+    }
+    
+    .risk-circle {
+        width: 100px;
+        height: 100px;
+        font-size: 1.25rem;
+    }
+    
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .feature-icon {
+        font-size: 2rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .btn, .alert, .card-header {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #dee2e6 !important;
+        box-shadow: none !important;
+    }
+    
+    .table {
+        font-size: 0.8rem;
+    }
+}
+
+/* Dark theme enhancements */
+[data-bs-theme="dark"] .feature-card {
+    background: rgba(255, 255, 255, 0.02);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .feature-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--bs-primary);
+}
+
+[data-bs-theme="dark"] .table th {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-bs-theme="dark"] .table tbody tr:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+}
+
+/* Code styling */
+code {
+    background-color: rgba(var(--bs-secondary-rgb), 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+/* Alert enhancements */
+.alert {
+    border: none;
+    border-radius: 10px;
+}
+
+.alert-info {
+    background-color: rgba(var(--bs-info-rgb), 0.1);
+    color: var(--bs-info);
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
