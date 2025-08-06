@@ -4,6 +4,9 @@ from flask import Flask, render_template, request, jsonify
 from feature_extractor import URLFeatureExtractor
 from ml_model import URLClassifier
 import traceback
+from flask_cors import CORS
+CORS(app)
+
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
