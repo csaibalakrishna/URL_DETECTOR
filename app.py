@@ -5,13 +5,13 @@ from feature_extractor import URLFeatureExtractor
 from ml_model import URLClassifier
 import traceback
 from flask_cors import CORS
-CORS(app)
 
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
+CORS(app)
 app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key")
 
 # Initialize feature extractor and ML classifier
