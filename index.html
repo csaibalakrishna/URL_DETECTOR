@@ -1,366 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URL Security Analyzer</title>
-    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>URL Security Analyzer</title>
+  <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="text-center mb-5">
-                    <div class="hero-icon mb-4">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <h1 class="display-4 fw-bold mb-3">URL Security Analyzer</h1>
-                    <p class="lead text-muted">
-                        Advanced machine learning-powered analysis to detect phishing and malicious URLs. 
-                        Get detailed security insights with 30+ extracted features.
-                    </p>
-                </div>
-            </div>
+  <div class="container">
+    <!-- Header -->
+    <div class="row justify-content-center">
+      <div class="col-lg-8 text-center mb-5">
+        <div class="hero-icon mb-4">
+          <i class="fas fa-shield-alt"></i>
         </div>
-
-        <!-- Main Form -->
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="card border-0 shadow-lg">
-                    <div class="card-body p-5">
-                        <form method="POST" action="{{ url_for('analyze') }}" id="analyzeForm">
-                            <div class="mb-4">
-                                <label for="url" class="form-label h5">
-                                    <i class="fas fa-link me-2"></i>Enter URL to Analyze
-                                </label>
-                                <div class="input-group input-group-lg">
-                                    <span class="input-group-text">
-                                        <i class="fas fa-globe"></i>
-                                    </span>
-                                    <input 
-                                        type="url" 
-                                        class="form-control" 
-                                        id="url" 
-                                        name="url" 
-                                        placeholder="https://example.com" 
-                                        required
-                                        autocomplete="url"
-                                    >
-                                </div>
-                                <div class="form-text">
-                                    <i class="fas fa-info-circle me-1"></i>
-                                    Enter any URL to analyze its security characteristics and potential threats
-                                </div>
-                            </div>
-
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary btn-lg" id="analyzeBtn">
-                                    <i class="fas fa-search me-2"></i>
-                                    Analyze URL Security
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="row justify-content-center mt-4">
-                    <div class="col-lg-8">
-                        {% for category, message in messages %}
-                            <div class="alert alert-{{ 'danger' if category == 'error' else 'info' }} alert-dismissible fade show" role="alert">
-                                <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'info-circle' }} me-2"></i>
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endif %}
-        {% endwith %}
-
-        <!-- Features Section -->
-        <div class="row justify-content-center mt-5">
-            <div class="col-lg-10">
-                <div class="row g-4">
-                    <div class="col-md-4">
-                        <div class="feature-card text-center p-4">
-                            <div class="feature-icon mb-3">
-                                <i class="fas fa-brain"></i>
-                            </div>
-                            <h5 class="fw-bold">AI-Powered Analysis</h5>
-                            <p class="text-muted mb-0">
-                                Machine learning model trained on thousands of URLs to detect sophisticated threats
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="feature-card text-center p-4">
-                            <div class="feature-icon mb-3">
-                                <i class="fas fa-list-check"></i>
-                            </div>
-                            <h5 class="fw-bold">30+ Security Features</h5>
-                            <p class="text-muted mb-0">
-                                Comprehensive analysis including domain age, SSL status, content patterns, and more
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="feature-card text-center p-4">
-                            <div class="feature-icon mb-3">
-                                <i class="fas fa-bolt"></i>
-                            </div>
-                            <h5 class="fw-bold">Real-time Results</h5>
-                            <p class="text-muted mb-0">
-                                Get instant security assessment with detailed explanations and recommendations
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Results Section -->
-        {% if results %}
-        <div class="row justify-content-center mt-5 results-section">
-            <div class="col-lg-10">
-                <div class="card border-0 shadow-lg">
-                    <div class="card-header bg-primary text-white py-3">
-                        <h4 class="mb-0">
-                            <i class="fas fa-chart-line me-2"></i>
-                            Security Analysis Results
-                        </h4>
-                    </div>
-                    <div class="card-body p-4">
-                        <!-- URL Info -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <div class="alert alert-{{ results.risk_level.class }} border-0" role="alert">
-                                    <div class="d-flex align-items-center">
-                                        <div class="me-3">
-                                            <i class="fas fa-{{ 'shield-exclamation' if results.risk_level.class == 'danger' else 'shield-check' if results.risk_level.class == 'success' else 'shield-halved' }} fa-2x"></i>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <h5 class="alert-heading mb-1">
-                                                Risk Level: {{ results.risk_level.level }}
-                                            </h5>
-                                            <p class="mb-1"><strong>URL:</strong> {{ results.url }}</p>
-                                            <p class="mb-0">{{ results.risk_level.description }}</p>
-                                        </div>
-                                        <div class="text-end">
-                                            <div class="h3 mb-0">
-                                                {{ "%.1f"|format(results.prediction.probability * 100) }}%
-                                            </div>
-                                            <small>Risk Score</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- ML Prediction Details -->
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="card bg-light border-0">
-                                    <div class="card-body text-center">
-                                        <h6 class="text-muted mb-2">ML Prediction</h6>
-                                        <h4 class="mb-0 text-{{ results.risk_level.class }}">
-                                            {{ "Malicious" if results.prediction.prediction == 1 else "Legitimate" }}
-                                        </h4>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card bg-light border-0">
-                                    <div class="card-body text-center">
-                                        <h6 class="text-muted mb-2">Confidence</h6>
-                                        <h4 class="mb-0">
-                                            {{ "%.1f"|format(results.prediction.probability * 100) }}%
-                                        </h4>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Feature Analysis -->
-                        <div class="row">
-                            <div class="col-12">
-                                <h5 class="mb-3">
-                                    <i class="fas fa-microscope me-2"></i>
-                                    Detailed Feature Analysis
-                                </h5>
-                                <div class="table-responsive">
-                                    <table class="table table-striped table-hover">
-                                        <thead class="table-dark">
-                                            <tr>
-                                                <th>Feature</th>
-                                                <th>Value</th>
-                                                <th>Description</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for feature, value in results.features.items() %}
-                                            <tr>
-                                                <td>
-                                                    <strong>{{ feature }}</strong>
-                                                </td>
-                                                <td>
-                                                    <span class="badge bg-{{ 'danger' if value == 1 else 'success' if value == 0 else 'warning' }}">
-                                                        {{ value }}
-                                                    </span>
-                                                </td>
-                                                <td class="text-muted">
-                                                    {{ results.feature_explanations.get(feature, 'No description available') }}
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="row mt-4">
-                            <div class="col-12 text-center">
-                                <button type="button" class="btn btn-success me-2" onclick="printResults()">
-                                    <i class="fas fa-print me-2"></i>
-                                    Print Results
-                                </button>
-                                <button type="button" class="btn btn-outline-primary" onclick="analyzeAnother()">
-                                    <i class="fas fa-plus me-2"></i>
-                                    Analyze Another URL
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- Security Info -->
-        <div class="row justify-content-center mt-5">
-            <div class="col-lg-8">
-                <div class="alert alert-info" role="alert">
-                    <h6 class="alert-heading">
-                        <i class="fas fa-shield-check me-2"></i>Security & Privacy
-                    </h6>
-                    <p class="mb-0">
-                        This tool analyzes URLs without storing your data. All analysis is performed in real-time 
-                        and results are not logged or shared with third parties.
-                    </p>
-                </div>
-            </div>
-        </div>
+        <h1 class="display-4 fw-bold mb-3">URL Security Analyzer</h1>
+        <p class="lead text-muted">
+          Advanced machine learning-powered analysis to detect phishing and malicious URLs.
+          Get detailed security insights with 30+ extracted features.
+        </p>
+      </div>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Custom JavaScript -->
-    <script>
-        document.getElementById('analyzeForm').addEventListener('submit', function(e) {
-            const btn = document.getElementById('analyzeBtn');
-            const originalText = btn.innerHTML;
-            
-            // Show loading state
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing...';
-            btn.disabled = true;
-            
-            // Reset button after 30 seconds if form hasn't completed
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }, 30000);
-        });
+    <!-- Form -->
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-lg">
+          <div class="card-body p-5">
+            <form id="analyzeForm">
+              <div class="mb-4">
+                <label for="url" class="form-label h5">
+                  <i class="fas fa-link me-2"></i>Enter URL to Analyze
+                </label>
+                <div class="input-group input-group-lg">
+                  <span class="input-group-text">
+                    <i class="fas fa-globe"></i>
+                  </span>
+                  <input type="url" class="form-control" id="url" name="url" placeholder="https://example.com" required />
+                </div>
+                <div class="form-text">
+                  <i class="fas fa-info-circle me-1"></i>
+                  Enter any URL to analyze its security characteristics and potential threats.
+                </div>
+              </div>
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg" id="analyzeBtn">
+                  <i class="fas fa-search me-2"></i>Analyze URL Security
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        // Auto-focus URL input on page load
-        {% if not results %}
-        document.getElementById('url').focus();
-        {% endif %}
-        
-        // URL validation
-        document.getElementById('url').addEventListener('input', function(e) {
-            const url = e.target.value;
-            if (url && !url.match(/^https?:\/\//)) {
-                e.target.setCustomValidity('');
-            }
-        });
+    <!-- Result Section -->
+    <div id="resultSection" class="row justify-content-center mt-5" style="display: none;">
+      <div class="col-lg-10">
+        <div class="card border-0 shadow">
+          <div class="card-body p-4">
+            <h4 class="mb-4"><i class="fas fa-shield-alt me-2"></i>Analysis Result</h4>
+            <p><strong>URL:</strong> <code id="resultUrl"></code></p>
+            <p><strong>Risk Level:</strong>
+              <span id="riskLevel" class="badge fs-6"></span>
+              <span id="riskDescription" class="text-muted"></span>
+            </p>
+            <p><strong>Prediction:</strong> <span id="classification"></span></p>
+            <div class="table-responsive mt-4">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Feature</th>
+                    <th>Value</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="featuresTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        // Print results function
-        function printResults() {
-            // Create a new window with only the results
-            const printWindow = window.open('', '_blank');
-            const resultsSection = document.querySelector('.row.justify-content-center.mt-5:has(.card.border-0.shadow-lg)');
-            
-            if (resultsSection) {
-                printWindow.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>URL Security Analysis Results</title>
-                        <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
-                        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-                        <style>
-                            @media print {
-                                .btn { display: none !important; }
-                                .card { border: 1px solid #dee2e6 !important; box-shadow: none !important; }
-                                body { background: white !important; color: black !important; }
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="container mt-4">
-                            <h2 class="mb-4">URL Security Analysis Report</h2>
-                            ${resultsSection.innerHTML}
-                        </div>
-                    </body>
-                    </html>
-                `);
-                printWindow.document.close();
-                printWindow.print();
-            }
+    <!-- Footer -->
+    <div class="row justify-content-center mt-5">
+      <div class="col-lg-10 text-center text-muted">
+        <p class="mb-0">
+          <i class="fas fa-shield-check me-1"></i>Analysis performed in real-time. No data is stored.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Custom JS -->
+  <script>
+    document.getElementById('analyzeForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const btn = document.getElementById('analyzeBtn');
+      const urlInput = document.getElementById('url');
+      const url = urlInput.value.trim();
+
+      if (!url) return;
+
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing...';
+      btn.disabled = true;
+
+      fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          alert("Error: " + data.error);
+          return;
         }
 
-        // Analyze another URL function - smooth transition
-        function analyzeAnother() {
-            // Clear the form
-            document.getElementById('url').value = '';
-            
-            // Hide results section with animation
-            const resultsSection = document.querySelector('.row.justify-content-center.mt-5:has(.card.border-0.shadow-lg)');
-            if (resultsSection) {
-                resultsSection.style.transition = 'opacity 0.3s ease-out';
-                resultsSection.style.opacity = '0';
-                
-                setTimeout(() => {
-                    resultsSection.style.display = 'none';
-                    // Focus on URL input
-                    document.getElementById('url').focus();
-                    // Scroll to top smoothly
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }, 300);
-            }
+        document.getElementById('resultUrl').textContent = data.url;
+        document.getElementById('riskLevel').textContent = data.risk_level.level + " Risk";
+        document.getElementById('riskLevel').className = 'badge bg-' + data.risk_level.class + ' fs-6';
+        document.getElementById('riskDescription').textContent = data.risk_level.description;
+        document.getElementById('classification').textContent = data.prediction.classification + " (" + Math.round(data.prediction.probability * 100) + "% confidence)";
+
+        const tbody = document.getElementById('featuresTable');
+        tbody.innerHTML = '';
+        for (const [feature, value] of Object.entries(data.features)) {
+          if (['Index', 'class'].includes(feature)) continue;
+          const status = value === 0 ? 'Safe' : value === 1 ? 'Suspicious' : 'High Risk';
+          const badgeClass = value === 0 ? 'success' : value === 1 ? 'warning' : 'danger';
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><strong>${feature.replace(/_/g, ' ')}</strong></td>
+            <td><code>${value}</code></td>
+            <td><span class="badge bg-${badgeClass}">${status}</span></td>
+          `;
+          tbody.appendChild(tr);
         }
 
-        // Smooth scroll to results when they appear
-        {% if results %}
-        window.addEventListener('load', function() {
-            setTimeout(() => {
-                const resultsSection = document.querySelector('.row.justify-content-center.mt-5:has(.card.border-0.shadow-lg)');
-                if (resultsSection) {
-                    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }, 100);
-        });
-        {% endif %}
-    </script>
+        document.getElementById('resultSection').style.display = 'block';
+      })
+      .catch(err => {
+        alert("Something went wrong.");
+        console.error(err);
+      })
+      .finally(() => {
+        btn.innerHTML = '<i class="fas fa-search me-2"></i>Analyze URL Security';
+        btn.disabled = false;
+      });
+    });
+
+    document.getElementById('url').focus();
+  </script>
 </body>
 </html>
