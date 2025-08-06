@@ -22,15 +22,22 @@ def index():
 @app.route('/api/analyze', methods=['POST'])
 def api_analyze():
     try:
-        data = request.get_json()
-        url = data.get('url', '').strip()
+        # Validate content-type
+        if not request.is_json:
+            return jsonify({'error': 'Content-Type must be application/json'}), 400
 
+        data = request.get_json(force=True, silent=True)
+        if not data:
+            return jsonify({'error': 'Invalid JSON data'}), 400
+
+        url = data.get('url', '').strip()
         if not url:
             return jsonify({'error': 'URL is required'}), 400
 
         if not url.startswith(('http://', 'https://')):
             url = 'http://' + url
 
+        # Extract features and run prediction
         features = feature_extractor.extract_features(url)
         prediction = url_classifier.predict(features)
 
@@ -40,11 +47,12 @@ def api_analyze():
             'prediction': prediction,
             'risk_level': get_risk_level(prediction['probability'])
         }
+
         return jsonify(result)
 
     except Exception as e:
-        logging.error(f"API Error: {str(e)}")
-        logging.error(traceback.format_exc())
+        logging.error("❌ Internal server error: %s", str(e))
+        traceback.print_exc()
         return jsonify({'error': 'Internal server error'}), 500
 
 def get_risk_level(probability):
